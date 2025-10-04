@@ -31,13 +31,15 @@ To build this, I am using CMake, if you're using CMake, the text file should be 
 
 ### Direct Compilation
 ```bash
-gcc slide_generator.c -o slides
+gcc slide_gen.c -o slides
 ./slides
 ```
 ### CMake
 Place slides.txt in your build directory, then:
 
 ```bash
+mkdir build
+cd build
 cmake ..
 cmake --build .
 ./slide_generator

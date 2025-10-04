@@ -10,9 +10,6 @@ int main(int argc, char* argsv[]){
     char filename[50];
     char *title = "This is title";
 
-    fprintf(output, "<html>\n");
-    fprintf(output, "<head>\n");
-
     while (fgets(line, sizeof(line), input)) {
         fprintf(output, "<html>\n");
         fprintf(output, "<head>\n");

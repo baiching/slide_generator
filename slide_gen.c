@@ -4,33 +4,52 @@
 int main(int argc, char* argsv[]){
     FILE *input = fopen("./slides.txt", "r");
     FILE *output = fopen("slide0001.html", "w");
+    // Here each lines will be stored at a time
     char line[256];
     int slide_num = 1;
     char filename[50];
+    char *nav = "<div class=\"navigation\">\n<a href=\"slide%04d.html\" class=\"nav-button prev\">Previous</a>\n<a href=\"slide%04d.html\" class=\"nav-button next\">Next</a>\n</div>\n</body>\n</html>";
     const char *CSS_STYLES = "<style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}.slide-container{background:white;width:80vw;max-width:1000px;height:70vh;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:60px 80px;display:flex;flex-direction:column;justify-content:center;}h1{font-size:3.5vw;color:#2d3748;margin:0 0 50px 0;text-align:left;border-bottom:4px solid #667eea;padding-bottom:20px;}ul{list-style:none;padding:0;margin:0;display:block;}li{font-size:2.2vw;color:#4a5568;margin:30px 0;padding-left:50px;position:relative;line-height:1.6;animation:slideIn 0.5s ease-out forwards;opacity:0;display:block;}li:nth-child(1){animation-delay:0.2s;}li:nth-child(2){animation-delay:0.4s;}li:nth-child(3){animation-delay:0.6s;}li::before{content:\"\\25B6\";position:absolute;left:0;color:#667eea;font-size:1.5vw;top:0.3vw;}@keyframes slideIn{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}.navigation{position:fixed;bottom:40px;width:80vw;max-width:1000px;display:flex;justify-content:space-between;padding:0 20px;}.nav-button{background:white;color:#667eea;text-decoration:none;padding:15px 30px;border-radius:10px;font-size:1.2vw;font-weight:600;box-shadow:0 5px 15px rgba(0,0,0,0.2);transition:all 0.3s ease;}.nav-button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.3);background:#667eea;color:white;}.nav-button.prev::before{content:\"\\2190 \";}.nav-button.next::after{content:\" \\2192\";}@media (max-width:768px){.slide-container{width:90vw;height:auto;padding:40px;}h1{font-size:6vw;}li{font-size:4vw;}li::before{font-size:3vw;}.navigation{width:90vw;}.nav-button{font-size:3vw;padding:12px 20px;}}</style>";
-    fprintf(output, "%s", CSS_STYLES);
-    fprintf(output, "</head>\n");
-    char *title = "This is title";
+    const char *intro_style = "<style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}.intro-container{background:white;width:80vw;max-width:1000px;height:70vh;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}.presentation-title{font-size:4vw;color:#2d3748;margin:0 0 60px 0;font-weight:700;line-height:1.3;}.presenter-info{font-size:2vw;color:#4a5568;margin:15px 0;line-height:1.8;}.presenter-name{font-weight:600;color:#667eea;}.presenter-email{color:#718096;font-style:italic;}.presentation-date{margin-top:40px;font-size:1.8vw;color:#a0aec0;font-weight:500;}.divider{width:200px;height:4px;background:linear-gradient(90deg,#667eea,#764ba2);margin:40px 0;border-radius:2px;}.navigation{position:fixed;bottom:40px;width:80vw;max-width:1000px;display:flex;justify-content:flex-end;padding:0 20px;}.nav-button{background:white;color:#667eea;text-decoration:none;padding:15px 30px;border-radius:10px;font-size:1.2vw;font-weight:600;box-shadow:0 5px 15px rgba(0,0,0,0.2);transition:all 0.3s ease;}.nav-button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.3);background:#667eea;color:white;}.nav-button.next::after{content:\" \\2192\";}@media (max-width:768px){.intro-container{width:90vw;height:auto;padding:40px;}.presentation-title{font-size:7vw;}.presenter-info{font-size:4vw;}.presentation-date{font-size:3.5vw;}.navigation{width:90vw;}.nav-button{font-size:3vw;padding:12px 20px;}}</style>";
+
+    //char *title = "This is title";
 
     fprintf(output, "<html>\n");
     fprintf(output, "<head>\n");
-    fprintf(output, "<title>%s</title>\n", title);
+    //fprintf(output, "<title>%s</title>\n", title);
+    fprintf(output, "%s", intro_style);
+    //fgets reads line by line from input
     while (fgets(line, sizeof(line), input)) {
 
         // Removing \n
        line[strcspn(line, "\r\n")] = 0;
-       printf("%s", line);
 
-        if (strlen(line) == 0) {
-            // This section will appear at the button
-            fprintf(output, "</ul>\n");
+        if (strstr(line, "Title") == line) {
+            fprintf(output, "</head>");
+            fprintf(output, "<div class=\"intro-container\">\n");
+            fprintf(output, "<h1 class=\"presentation-title\">%s</h1>", line+6);
+        }
+        else if (strstr(line, "Presenter:") == line) {
+            fprintf(output, "<p class=\"presenter-info presenter-name\">%s</p>\n", line+11);
+        }
+        else if (strstr(line, "Email:") == line) {
+            fprintf(output, "<p class=\"presenter-info presenter-email\">%s</p>\n", line+7);
+        }
+        else if (strstr(line, "Date:") == line) {
+            fprintf(output, "<p class=\"presentation-date\">%s</p>\n", line+6);
             fprintf(output, "</div>\n");
             fprintf(output, "<div class=\"navigation\">\n");
-            fprintf(output, "  <a href=\"slide%04d.html\" class=\"nav-button prev\">Previous</a>\n", slide_num-1);
             fprintf(output, "  <a href=\"slide%04d.html\" class=\"nav-button next\">Next</a>\n", slide_num+1);
             fprintf(output, "</div>\n");
             fprintf(output, "</body>\n");
             fprintf(output, "</html>");
+            fclose(output);
+        }
+        else if (strlen(line) == 0) {
+            // This section will appear at the button
+            fprintf(output, "</ul>\n");
+            fprintf(output, "</div>\n");
+            fprintf(output, nav, slide_num-1, slide_num+1);
             //-----------------------------------------
             fclose(output);
             slide_num++;
@@ -40,7 +59,7 @@ int main(int argc, char* argsv[]){
             //This will appear at the top
             fprintf(output, "<html>\n");
             fprintf(output, "<head>\n");
-            fprintf(output, "<title>%s</title>\n", title);
+            //fprintf(output, "<title>%s</title>\n", title);
             fprintf(output, "%s", CSS_STYLES);
             fprintf(output, "</head>\n");
             fprintf(output, "<body>\n");
@@ -55,9 +74,10 @@ int main(int argc, char* argsv[]){
         }
 
     }
+    fprintf(output, "</ul>\n");
+    fprintf(output, "</div>\n");
     fprintf(output, "<div class=\"navigation\">\n");
     fprintf(output, "  <a href=\"slide%04d.html\" class=\"nav-button prev\">Previous</a>\n", slide_num-1);
-    fprintf(output, "  <a href=\"slide%04d.html\" class=\"nav-button next\">Next</a>\n", slide_num+1);
     fprintf(output, "</div>\n");
     fprintf(output, "</body>\n");
     fprintf(output, "</html>");
